@@ -62,4 +62,4 @@ Using the code in the repo will require having the following tools installed:
 
 1. Modify the `variable.tf` file to your liking.
 
-2. Deploy the `az_key_vault.sh`.  This will run the `az_key_vault` and `gitops_operator`.
+2. Deploy the `kubeconfig_gitops.sh`.  This will run the `az_key_vault` and `gitops_operator`.
