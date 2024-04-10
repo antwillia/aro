@@ -11,7 +11,7 @@ variable "user_home_dir" {
 }
 
 variable "resource_group_name" {
-  default     = "openenv-sjsjc"
+  default     = "openenv-bhnbm"
   type        = string
   description = "The name of the resource group"
 }
