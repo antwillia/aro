@@ -211,8 +211,8 @@ variable "worker_node_count" {
   }
 }
 
-# variable "user_home_dir" {
-#   default     = "/Users/anwillia"
-#   type        = string
-#   description = "The name of the home/username"
-# }
+variable "user_home_dir" {
+  default     = "/Users/anwillia"
+  type        = string
+  description = "The name of the home/username"
+}

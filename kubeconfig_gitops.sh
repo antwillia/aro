@@ -6,10 +6,10 @@ echo "Pull kubeconfig and add to azure key vault"
 # terraform init
 # terraform apply -auto-approve -var cluster_name=aro-atwlab
 
-cd modules/az_key_vault
-terraform init
-terraform apply -auto-approve 
+# cd modules/az_key_vault
+# terraform init
+# terraform apply -auto-approve 
 
-cd ../gitops_operator
+cd modules/gitops_operator
 terraform init
 terraform apply -auto-approve 

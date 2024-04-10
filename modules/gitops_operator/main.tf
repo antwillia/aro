@@ -82,3 +82,15 @@ resource "kubernetes_cluster_role_binding" "argocd-role-binding" {
     namespace = "openshift-gitops"
   }
 }
+
+# Deploy App of Apps
+
+resource "helm_release" "gitops" {
+  name = "gitops"
+  chart = "gitops"
+  repository = "."
+  namespace = "default"
+  max_history = 3
+  wait = true
+  reset_values = true
+}

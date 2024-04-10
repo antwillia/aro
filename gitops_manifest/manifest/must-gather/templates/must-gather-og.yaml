@@ -1,0 +1,6 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: global-load-balancer-operator
+  namespace: global-load-balancer-operator
+spec: {}
