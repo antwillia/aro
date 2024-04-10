@@ -5,4 +5,4 @@
 global:
   manifest_dir: modules/gitops_operator/gitops
   repoURL: https://github.com/antwillia/aro
-  repoBranch: gitops_manifest
+  repoBranch: gitops2
