@@ -1,0 +1,7 @@
+# Default values for App of Apps
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates
+
+manifest_dir: modules/gitops_operator/gitops
+repoURL: https://github.com/antwillia/aro
+repoBranch: gitops_manifest
