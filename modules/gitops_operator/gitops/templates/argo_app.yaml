@@ -11,7 +11,7 @@ spec:
     namespace: openshift-gitops
     server: 'https://kubernetes.default.svc'
   source:
-    path: "{{ .Values.global.manifest_dir}}/gitops-application"
+    path: "{{ .Values.manifest_dir}}/gitops-application"
     repoURL: "{{ .Values.global.repoURL }}"
     targetRevision: "{{ .Values.global.repoBranch }}"
     direcory:

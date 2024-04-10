@@ -2,7 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates
 
+
+manifest_dir: modules/gitops_operator/gitops
+
 global:
-  manifest_dir: modules/gitops_operator/gitops
   repoURL: https://github.com/antwillia/aro
   repoBranch: gitops2
+  manifest_appdir: gitops_manifest/manifest
