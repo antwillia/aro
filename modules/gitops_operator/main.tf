@@ -83,9 +83,17 @@ resource "kubernetes_cluster_role_binding" "argocd-role-binding" {
   }
 }
 
+resource "time_sleep" "wait_150_seconds" {
+  depends_on = [ kubernetes_manifest.gitops-operator ]
+
+  create_duration = "150s"
+}
+
 # Deploy App of Apps
 
 resource "helm_release" "gitops" {
+  depends_on = [ time_sleep.wait_150_seconds ]
+
   name = "gitops"
   chart = "gitops"
   repository = "."

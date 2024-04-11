@@ -12,8 +12,16 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     path: "{{ .Values.manifest_dir}}/gitops-application"
-    repoURL: "{{ .Values.global.repoURL }}"
-    targetRevision: "{{ .Values.global.repoBranch }}"
+    repoURL: "{{ .Values.repoURL }}"
+    targetRevision: "{{ .ValuesrepoBranch }}"
+    helm:
+      valueFiles:
+        - values.yaml
+      values: |
+        global:
+          manifest_dir: gitops_manifest/manifest
+          repoURL: {{ Values.repoURL }}
+          repoBranch: {{ Values.repoBranch }}
     direcory:
       recurse: true
   syncPolicy:
