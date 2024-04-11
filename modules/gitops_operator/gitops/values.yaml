@@ -3,8 +3,7 @@
 # Declare variables to be passed into your templates
 
 global:
-  manifest_appdir: gitops_manifest/manifest
-  manifest_dir: modules/gitops_operator/gitops
+  manifest_dir: gitops_manifest/manifest
   repoURL: https://github.com/antwillia/aro
   repoBranch: gitops2
  
