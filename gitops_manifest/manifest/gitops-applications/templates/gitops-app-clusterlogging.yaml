@@ -8,7 +8,7 @@ spec:
     namespace: openshift-gitops
     server: 'https://kubernetes.default.svc'
   source:
-    path: "{{ .Values.global.manifest_appdir }}/clusterlogging"
+    path: "{{ .Values.global.manifest_dir }}/clusterlogging"
     repoURL: "{{ .Values.global.repoURL }}"
     targetRevision: "{{ .Values.global.repoBranch }}"
     helm:
