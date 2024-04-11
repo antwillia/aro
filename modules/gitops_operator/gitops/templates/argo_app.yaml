@@ -1,27 +1,29 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: ApplicationSet
 metadata:
   name: gitops-applications
   namespace: openshift-gitops
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io
 spec:
-  project: infrastructure
-  destination:
-    namespace: openshift-gitops
-    server: 'https://kubernetes.default.svc'
-  source:
-    path: "{{ .Values.global.manifest_dir }}/gitops-applications"
-    repoURL: "{{ .Values.global.repoURL }}"
-    targetRevision: "{{ .Values.global.repoBranch }}"
-    helm:
-      valueFiles:
-        - values.yaml
-    direcory:
-      recurse: true
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - git:
+      repoURL: {{ .Values.global.repoURL }}
+      revision: gitops2
+      directories:
+      - path: gitops_manifest/manifest/*
+  template:
+    metadata:
+      name: '{{.path.basename}}'
+    spec:
+      project: infrastructure
+      source:
+        repoURL: {{ .Values.global.repoURL }}
+        targetRevision: gitops2
+        path: '{{.path.path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{.path.basename}}'
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
