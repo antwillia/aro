@@ -8,22 +8,22 @@ spec:
   goTemplateOptions: ["missingkey=error"]
   generators:
   - git:
-      repoURL: {{ .Values.global.repoURL }}
-      revision: gitops2
+      repoURL: {{ .Values.repoURL }}
+      revision: {{ .Values.repoBranch }}
       directories:
       - path: gitops_manifest/manifest/*
   template:
     metadata:
-      name: '{{.path.basename}}'
+      name: '{{"{{"}}.path.basename{{"}}"}}'
     spec:
       project: infrastructure
       source:
-        repoURL: {{ .Values.global.repoURL }}
-        targetRevision: gitops2
-        path: '{{.path.path}}'
+        repoURL: {{ .Values.repoURL }}
+        targetRevision: {{ .Values.repoBranch }}
+        path: '{{"{{"}}.path.path{{"}}"}}'
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{.path.basename}}'
+        namespace: '{{"{{"}}.path.basename{{"}}"}}'
       syncPolicy:
         syncOptions:
         - CreateNamespace=true
