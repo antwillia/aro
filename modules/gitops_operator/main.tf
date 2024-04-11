@@ -92,7 +92,7 @@ resource "time_sleep" "wait_60_seconds" {
 # Deploy App of Apps
 
 resource "helm_release" "gitops" {
-  depends_on = [ time_sleep.wait_150_seconds ]
+  depends_on = [ time_sleep.wait_60_seconds ]
 
   name = "gitops"
   chart = "gitops"
