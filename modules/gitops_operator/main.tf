@@ -100,5 +100,5 @@ resource "helm_release" "gitops" {
   namespace = "default"
   max_history = 3
   wait = true
-  reset_values = true
+  
 }
