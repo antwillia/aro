@@ -21,10 +21,10 @@ provider "azurerm" {
     resource_group {
       prevent_deletion_if_contains_resources = false
     }
-    # key_vault {
-    #   purge_soft_deleted_secrets_on_destroy = true
-    #   recover_soft_deleted_secrets          = true
-    # }
+    key_vault {
+      purge_soft_deleted_secrets_on_destroy = true
+      recover_soft_deleted_secrets          = true
+    }
   }
   skip_provider_registration = true
 }

@@ -1,6 +1,6 @@
 aro_version = "4.13.23"
-resource_group_name = "openenv-bhnbm"
+resource_group_name = aro-atwlab-rg
 pull_secret_path = "~/Downloads/pull-secret.txt"
 location = "eastus"
-subscription_id = "9b2e6928-8256-4bcd-8dde-c339c2420978"
-domain = "openenv-bhnbm"
+subscription_id = "18e6737a-b665-4e47-85d7-2aca4ce229d8"
+domain = "openenv-8jvsc"

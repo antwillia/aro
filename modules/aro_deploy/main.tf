@@ -4,7 +4,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "main" {
-  name     = var.resource_group_name
+  name     = "${local.name_prefix}-rg"
   location = var.location
 
 }
@@ -144,10 +144,10 @@ resource "azurerm_redhat_openshift_cluster" "cluster" {
 #   value = azurerm_redhat_openshift_cluster.cluster.console_url
 # }
 
-resource "time_sleep" "wait_150_seconds" {
+resource "time_sleep" "wait_60_seconds" {
   depends_on = [azurerm_redhat_openshift_cluster.cluster]
 
-  create_duration = "150s"
+  create_duration = "60s"
 }
 
 data "azurerm_client_config" "current" {}
@@ -167,7 +167,7 @@ resource "azapi_resource_action" "kubeadmin" {
   response_export_values = ["*"]
 }
 
-resource "azapi_resource_action" "test" {
+resource "azapi_resource_action" "kubeconfig" {
   depends_on = [azurerm_redhat_openshift_cluster.cluster, time_sleep.wait_150_seconds]
   type        = "Microsoft.RedHatOpenShift/openShiftClusters@2023-07-01-preview"
   resource_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${data.azurerm_resource_group.aro-rg.name}/providers/Microsoft.RedHatOpenShift/openShiftClusters/aro-atwlab"
@@ -176,9 +176,9 @@ resource "azapi_resource_action" "test" {
   response_export_values = ["*"]
 }
 
-resource "azurerm_key_vault" "atwlab-vault" {
+resource "azurerm_key_vault" "anwillia-vault" {
   depends_on = [ azapi_resource_action.test ]
-  name                       = "atwlab-vault"
+  name                       = "anwillia-vault"
   location                   = data.azurerm_resource_group.aro-rg.location
   resource_group_name        = data.azurerm_resource_group.aro-rg.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -188,7 +188,7 @@ resource "azurerm_key_vault" "atwlab-vault" {
 }
 
 resource "azurerm_role_assignment" "atw-rbac" {
-  depends_on = [ azurerm_key_vault.atwlab-vault ]
+  depends_on = [ azurerm_key_vault.anwillia-vault ]
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
@@ -198,11 +198,11 @@ resource "azurerm_key_vault_secret" "kubeconfig" {
   depends_on = [ azurerm_role_assignment.atw-rbac ]
   name         = "kubeconfig"
   value        = base64decode(jsondecode(azapi_resource_action.test.output).kubeconfig)
-  key_vault_id = azurerm_key_vault.atwlab-vault.id
+  key_vault_id = azurerm_key_vault.anwillia-vault.id
 }
 
 resource "local_file" "kubeconfig" {
-  depends_on = [ azurerm_key_vault_secret.kubeconfig ]
-  content = base64decode(jsondecode(azapi_resource_action.test.output).kubeconfig)
+  depends_on = [ azapi_resource_action.kubeconfig ]
+  content = base64decode(jsondecode(azapi_resource_action.kubeconfig.output).kubeconfig)
   filename = format("%s/%s/config", var.user_home_dir, var.cluster_name)
 }

@@ -7,6 +7,6 @@ output "kubeadmin" {
 }
 
 output "kubeconfig" {
-  value = base64decode(jsondecode(azapi_resource_action.test.output).kubeconfig)
+  value = base64decode(jsondecode(azapi_resource_action.kubeconfig.output).kubeconfig)
   sensitive = true
 }
