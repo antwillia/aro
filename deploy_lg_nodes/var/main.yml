@@ -1,0 +1,13 @@
+machine_zones:
+ - 1
+ - 2
+ - 3
+machine_size: Standard_D8s_v3
+node_cpu: 8
+node_mem: 32768
+disk_sizegb: 128
+storage_acct_type: Premium_LRS
+node_type: worker-lg
+node_role: worker
+kubeadminPassword: # secret lookup for password
+ocpApiHost: # OCP cluster api url

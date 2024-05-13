@@ -1,0 +1,63 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  annotations:
+    machine.openshift.io/GPU: '0'
+    machine.openshift.io/memoryMb: '{{ node_mem }}'
+    machine.openshift.io/vCPU: '{{ node_cpu }}'
+  name: "{{ cluster_name.resources[0].spec.infraId }}-{{ node_type }}-{{ cluster_name.resources[0].spec.location }}{{ machine_zone }}"
+  namespace: openshift-machine-api
+  labels:
+    machine.openshift.io/cluster-api-cluster: "{{ cluster_name.resources[0].spec.infraId }}"
+    machine.openshift.io/cluster-api-machine-role: "{{ node_role }}"
+    machine.openshift.io/cluster-api-machine-type: "{{ node_type }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: "{{ cluster_name.resources[0].spec.infraId }}"
+      machine.openshift.io/cluster-api-machineset: "{{ cluster_name.resources[0].spec.infraId }}-{{ node_type }}-{{ cluster_name.resources[0].spec.location }}{{ machine_zone }}"
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: "{{ cluster_name.resources[0].spec.infraId }}"
+        machine.openshift.io/cluster-api-machine-role: "{{ node_role }}"
+        machine.openshift.io/cluster-api-machine-type: "{{ node_type }}"
+        machine.openshift.io/cluster-api-machineset: "{{ cluster_name.resources[0].spec.infraId }}-{{ node_type }}-{{ cluster_name.resources[0].spec.location }}{{ machine_zone }}"
+    spec:
+      lifecycleHooks: {}
+      metadata: {}
+      providerSpec:
+        value:
+          osDisk:
+            diskSettings: {}
+            diskSizeGB: {{ disk_sizegb }}
+            managedDisk:
+              storageAccountType: "{{ storage_acct_type }}"
+            osType: Linux
+          networkResourceGroup: "{{ cluster_name.resources[0].spec.vnetId.split('/')[-5] }}"
+          publicLoadBalancer: "{{ cluster_name.resources[0].spec.infraId }}"
+          userDataSecret:
+            name: worker-user-data
+          vnet: "{{ cluster_name.resources[0].spec.vnetId.split('/')[-1] }}"
+          credentialsSecret:
+            name: azure-cloud-credentials
+            namespace: openshift-machine-api
+          diagnostics: {}
+          zone: '{{ machine_zone }}'
+          metadata:
+            creationTimestamp: null
+          publicIP: false
+          resourceGroup: "{{ cluster_name.resources[0].spec.clusterResourceGroupId.split('/')[-1] }}"
+          kind: AzureMachineProviderSpec
+          location: "{{ cluster_name.resources[0].spec.location }}"
+          vmSize: "{{ machine_size }}"
+          image:
+            offer: aro4
+            publisher: azureopenshift
+            resourceID: ''
+            sku: aro_413
+            version: 413.92.20230614
+          acceleratedNetworking: true
+          subnet: worker-subnet
+          apiVersion: machine.openshift.io/v1beta1

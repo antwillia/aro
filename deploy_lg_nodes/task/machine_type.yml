@@ -1,0 +1,68 @@
+---
+tasks:
+  - name: Access cluster and Upgrade Machine Type for Worker Nodes
+    block:
+      - name: Login with shell to get Kubeadmin token
+        shell: |
+          oc login -u kubeadmin -p {{ kubeadminPassword }} {{ ocpApiHost }} &> /dev/null
+          oc whoami --show-token
+        register: loginResult
+        until: ('sha256' in loginResult.stdout)
+        retries: 3
+        delay: 3
+        no_log: True
+
+      - name: Set apiKey fact
+        set_fact:
+          ocpApiKey: "{{ loginResult.stdout }}"
+
+      - name: Get infromation about cluster name
+        kubernetes.core.k8s_info:
+          api_key: "{{ ocpApiKey }}"
+          api_version: aro.openshift.io/v1alpha1
+          kind: cluster
+          name: cluster
+        register: cluster_name
+
+      #- name: showing name
+      #  debug:
+      #    msg:
+      #    - "{{ cluster_name }}"
+      #    - "{{ cluster_name.resources[0].spec.infraId }}"
+      #    - "{{ cluster_name.resources[0].spec.location }}"
+      #    - "{{ cluster_name.resources[0].spec.clusterResourceGroupId.split('/')[-1] }}"
+      #    - "{{ cluster_name.resources[0].spec.vnetId.split('/')[-1] }}"
+      #    - "{{ cluster_name.resources[0].spec.vnetId.split('/')[-5] }}"
+
+      - name: Apply MachineSet
+        vars:
+          machine_zone: "{{ item }}"
+        kubernetes.core.k8s:
+          api_key: "{{ ocpApiKey }}"
+          state: present
+          template:
+            path: "{{ role_path }}/templates/machinesettemp.j2"
+        loop: "{{ machine_zones }}"
+
+      - name: Checking for Node status
+        kubernetes.core.k8s_info:
+          api_key: "{{ ocpApiKey }}"
+          api_version: machine.openshift.io/v1beta1
+          kind: MachineSet
+          name: "{{ cluster_name.resources[0].spec.infraId }}-{{ node_type }}-{{ cluster_name.resources[0].spec.location }}{{ item }}"
+          namespace: openshift-machine-api
+        register: ms_status 
+        loop: "{{ machine_zones }}"
+        until: ( ms_status.resources[0].status.availableReplicas is defined ) and ( ms_status.resources[0].status.readyReplicas == ms_status.resources[0].status.availableReplicas )
+        retries: 30
+        delay: 30
+        ignore_errors: false
+
+      - name: Display node status
+        debug:
+          msg:
+            - "Node Added and Ready"
+    always:
+      - name: Log out of cluster and revoke access
+        shell: |
+          oc logout        
