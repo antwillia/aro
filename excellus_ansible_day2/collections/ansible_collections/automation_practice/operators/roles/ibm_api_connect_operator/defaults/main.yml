@@ -1,0 +1,4 @@
+---
+channel: v3.5
+installPlanApproval: Automatic
+startingCSV: ibm-apiconnect.v3.5.0

@@ -1,0 +1,4 @@
+---
+channel: stable-5.9
+installPlanApproval: Automatic
+startingCSV: cluster-logging.v5.9.1

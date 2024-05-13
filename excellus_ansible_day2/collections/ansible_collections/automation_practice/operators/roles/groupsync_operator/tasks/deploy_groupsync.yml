@@ -1,0 +1,57 @@
+---
+- name: Deploy GroupSync Operator Namespace
+  kubernetes.core.k8s:
+    state: present
+    api_key: "{{ ocpApiKey }}"
+    wait: yes
+    definition: "{{ lookup('file', 'files/groupsync-ns.yaml') | from_yaml }}"
+
+- name: Deploy Test Namespace
+  kubernetes.core.k8s:
+    state: present
+    api_key: "{{ ocpApiKey }}"
+    wait: yes
+    definition: "{{ lookup('file', 'files/test-ns.yaml') | from_yaml }}"
+
+- name: Deploy GroupSync Secret
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    state: present
+    wait: yes
+    resource_definition: "{{ lookup('template', 'templates/groupsync-secret.j2') }}"
+
+# - name: Deploy GroupSync Operator Group
+#   kubernetes.core.k8s:
+#     api_key: "{{ ocpApiKey }}"
+#     state: present
+#     wait: yes
+#     resource_definition: "{{ lookup('file', 'files/groupsync-og.yaml') | from_yaml }}"
+
+# - name: Deploy GroupSync Subscription
+#   kubernetes.core.k8s:
+#     api_key: "{{ ocpApiKey }}"
+#     state: present
+#     wait: yes
+#     resource_definition: "{{ lookup('template', 'templates/groupsync-sub.j2') }}"
+
+# - name: Deploy GroupSync instance
+#   kubernetes.core.k8s:
+#     api_key: "{{ ocpApiKey }}"
+#     state: present
+#     wait: yes
+#     resource_definition: "{{ lookup('template', 'templates/groupsync-int.j2') }}"
+
+- name: Deploy Cluster Admin Rolebinding
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    state: present
+    wait: yes
+    resource_definition: "{{ lookup('file', 'files/clusteradmin-role-binding.yaml') | from_yaml }}"
+
+- name: Deploy Test Developers Edit Rolebinding
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    state: present
+    wait: yes
+    resource_definition: "{{ lookup('file', 'files/test-ns-rolebinding.yaml') | from_yaml }}"
+...

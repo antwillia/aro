@@ -1,0 +1,30 @@
+---
+- name: Deploy Cert-Manager Operator Namespace
+  kubernetes.core.k8s:
+    state: present
+    api_key: "{{ ocpApiKey }}"
+    wait: yes
+    definition: "{{ lookup('file', 'files/cert-manager-ns.yaml') | from_yaml }}"
+
+- name: Deploy Cert-Manager Operator Group
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    state: present
+    wait: yes
+    resource_definition: "{{ lookup('file', 'files/cert-manager-og.yaml') | from_yaml }}"
+
+- name: Deploy Cert-Manager Subscription
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    state: present
+    wait: yes
+    resource_definition: "{{ lookup('template', 'templates/cert-manager-sub.j2') }}"
+
+# Place holder for Cert-Manager instance
+# - name: Deploy Cert-Manager instance
+#   kubernetes.core.k8s:
+#     api_key: "{{ ocpApiKey }}"
+#     state: present
+#     wait: yes
+#     resource_definition:
+...

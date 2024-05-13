@@ -1,0 +1,4 @@
+---
+channel: stable-v1
+installPlanApproval: Automatic
+startingCSV: cert-manager-operator.v1.13.0

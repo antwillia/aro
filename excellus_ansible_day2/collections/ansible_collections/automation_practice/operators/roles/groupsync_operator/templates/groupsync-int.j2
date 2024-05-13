@@ -1,0 +1,15 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: GroupSync
+metadata:
+  name: azure-groupsync
+  namespace: group-sync-operator
+spec:
+  providers:
+    - name: azure
+      azure:
+        credentialsSecret:
+          name: azure-group-sync
+          namespace: group-sync-operator
+      groups: {{ azure_groups }}
+      prune: false
+  schedule: '*/5 * * * *'

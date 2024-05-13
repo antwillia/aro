@@ -1,0 +1,4 @@
+---
+channel: v1.3
+installPlanApproval: Automatic
+startingCSV: open-liberty-operator.v1.3.1

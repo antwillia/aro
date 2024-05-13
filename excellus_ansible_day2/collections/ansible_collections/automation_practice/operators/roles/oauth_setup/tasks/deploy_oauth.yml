@@ -1,0 +1,33 @@
+---
+- name: Deploy Oauth Break Glass Secret Configuration
+  kubernetes.core.k8s:
+    state: present
+    validate_certs: false
+    api_key: "{{ ocpApiKey }}"
+    wait: yes
+    definition: "{{ lookup('template', 'templates/break-glass-secret.j2')}}"
+
+- name: Deploy Break Glass Account Role Binding
+  kubernetes.core.k8s:
+    state: present
+    validate_certs: false
+    api_key: "{{ ocpApiKey }}"
+    wait: yes
+    definition: "{{ lookup('template', 'templates/break-glass-rolebinding.j2')}}"
+
+- name: Deploy Oauth Client Secret Configuration
+  kubernetes.core.k8s:
+    state: present
+    validate_certs: false
+    api_key: "{{ ocpApiKey }}"
+    wait: yes
+    definition: "{{ lookup('template', 'templates/oauth-client-secret.j2')}}"
+
+- name: Deploy Oauth Cluster Configuration
+  kubernetes.core.k8s:
+    state: present
+    validate_certs: false
+    api_key: "{{ ocpApiKey }}"
+    wait: yes
+    definition: "{{ lookup('template', 'templates/oauth-cluster.j2')}}"
+...

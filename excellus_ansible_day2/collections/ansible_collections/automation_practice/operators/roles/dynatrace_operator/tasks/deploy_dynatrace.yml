@@ -1,0 +1,30 @@
+---
+- name: Deploy Dynatrace Operator Namespace
+  kubernetes.core.k8s:
+    state: present
+    api_key: "{{ ocpApiKey }}"
+    wait: yes
+    definition: "{{ lookup('file', 'files/dynatrace-ns.yaml') | from_yaml }}"
+
+- name: Deploy Dynatrace Operator Group
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    state: present
+    wait: yes
+    resource_definition: "{{ lookup('file', 'files/dynatrace-og.yaml') | from_yaml }}"
+
+- name: Deploy Dynatrace Subscription
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    state: present
+    wait: yes
+    resource_definition: "{{ lookup('template', 'templates/dynatrace-sub.j2') }}"
+
+# Place holder for Dynatrace instance
+# - name: Deploy Dynatrace instance
+#   kubernetes.core.k8s:
+#     api_key: "{{ ocpApiKey }}"
+#     state: present
+#     wait: yes
+#     resource_definition:
+...

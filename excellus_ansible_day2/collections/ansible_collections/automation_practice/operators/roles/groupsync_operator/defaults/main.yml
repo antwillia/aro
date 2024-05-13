@@ -1,0 +1,7 @@
+---
+channel: alpha
+installPlanApproval: Automatic
+startingCSV: group-sync-operator.v0.0.28
+azure_groups:
+  - ARO_Admins
+  - ARO_Developers

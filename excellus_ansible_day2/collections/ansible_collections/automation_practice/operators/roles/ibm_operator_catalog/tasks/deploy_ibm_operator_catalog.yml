@@ -1,0 +1,8 @@
+---
+- name: Deploy IBM Operator Catalog
+  kubernetes.core.k8s:
+    state: present
+    api_key: "{{ ocpApiKey }}"
+    wait: yes
+    definition: "{{ lookup('file', 'files/ibm-operator-catalog.yml') | from_yaml }}"
+...

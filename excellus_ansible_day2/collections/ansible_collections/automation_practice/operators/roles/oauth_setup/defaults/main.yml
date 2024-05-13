@@ -1,0 +1,2 @@
+---
+excellushtpassword: "{{ lookup('hashi_vault', 'secret=secret/data/ocp4/excellushtpassword:pass token={{ vtoken }} url=http://vault.k1ckr0cks.local:8200') }}"

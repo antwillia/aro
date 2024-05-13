@@ -1,0 +1,149 @@
+- name: Day2ops
+  hosts: localhost
+  become: no
+  gather_facts: no
+  connection: local
+  
+  vars:
+    kubeadminPassword: "{{ lookup('hashi_vault', 'secret=secret/data/ocp4/atwlab-kubeadminPassword:pass token={{ vtoken }} url=http://vault.k1ckr0cks.local:8200') }}"
+    ocpApiHost: https://api.openenv-dlvx9.eastus.aroapp.io:6443/
+    excellusPassword: "{{ lookup('hashi_vault', 'secret=secret/data/ocp4/excellusPassword:pass token={{ vtoken }} url=http://vault.k1ckr0cks.local:8200') }}"
+    az_application: aro-atwlab-cluster-app
+
+  tasks:
+    - name: Access cluster and preform day2ops tasks
+      block:
+        - name: Get Azure Application Client ID
+          shell: |
+            az ad app list --display-name {{ az_application }} | grep -i appid | awk '{ gsub("\"",""); print $2 }' | tr -d ,
+          register: az_app_client_id
+          no_log: True
+
+        # This Prints the Application Client ID in Console
+        # - name: Print Application Client ID
+        #   debug:
+        #     msg:
+        #     - "{{ az_app_client_id.stdout }}"
+        #   when: do_debug | default(False) | bool
+
+        - name: Create Application Registration Client Secret
+          shell: |
+            az ad app credential reset --id {{ az_app_client_id.stdout }} --display-name excellus --append | grep -i password | awk '{ gsub("\"",""); print $2 }' | tr -d ,
+          register: app_secret
+          no_log: True
+
+        # # This prints the Application Secret ID to the console
+        # - name: Print Application Secret ID
+        #   debug:
+        #     msg:
+        #     - "{{ app_secret.stdout }}"
+        #   when: do_debug | default(False) | bool
+
+        - name: Get Application Registration Tenant ID
+          shell: |
+            az account list | grep -i homeTenantID | awk '{ gsub("\"",""); print $2 }' | tr -d ,
+          register: az_app_tenantid
+          no_log: True
+
+        - name: Login with shell to get Kubeadmin token
+          shell: |
+            oc login -u kubeadmin -p {{ kubeadminPassword }} {{ ocpApiHost }} &> /dev/null
+            oc whoami --show-token
+          register: loginResult
+          until: ('sha256' in loginResult.stdout)
+          retries: 3
+          delay: 3
+          no_log: True
+
+        - name: Set apiKey fact
+          set_fact:
+            ocpApiKey: "{{ loginResult.stdout }}"
+
+        # Deploy Oauth Configuration
+        - name: Deploy Oauth
+          ansible.builtin.import_role:
+            name: automation_practice.operators.oauth_setup
+          tags:
+            - oauth
+
+        # Deploy Groupsync Operator
+        - name: Deploy Groupsync Operator
+          ansible.builtin.import_role:
+            name: automation_practice.operators.groupsync_operator
+          tags:
+            - groupsync
+      
+      always:
+          - name: Log out of cluster and revoke access
+            shell: |
+              oc logout
+
+    - name: Access cluster and preform day2ops tasks
+      block:
+        - name: Test login with shell to get token
+          shell: |
+            oc login  -u excellus-admin -p {{ excellusPassword }} {{ ocpApiHost }} &> /dev/null
+            oc whoami --show-token
+          register: loginResult
+          until: ('sha256' in loginResult.stdout)
+          retries: 3
+          delay: 3
+          no_log: True
+          
+        - name: Set apiKey fact
+          set_fact:
+            ocpApiKey: "{{ loginResult.stdout }}"
+
+        # Deploy IBM Operator Catalog
+        - name: Deploy IBM Operator Catalog
+          ansible.builtin.import_role:
+            name: automation_practice.operators.ibm_operator_catalog
+          tags:
+            - ibm-operator-catalog
+        
+        # Deploy Openshift Logging Operator
+        - name: Deploy Openshift Logging Operator
+          ansible.builtin.import_role:
+            name: automation_practice.operators.openshift_logging_operator
+          tags:
+            - logging
+
+        # Deploy Dynatrace Operator
+        - name: Deploy Dynatrace Operator
+          ansible.builtin.import_role:
+            name: automation_practice.operators.dynatrace_operator
+          tags:
+            - dynatrace
+
+        # Deploy Open Liberty Operator
+        - name: Deploy Open Liberty Operator
+          ansible.builtin.import_role:
+            name: automation_practice.operators.open_liberty_operator
+          tags:
+            - Liberty
+
+        # Deploy IBM API Connect Operator
+        - name: Deploy IBM API Connect Operator
+          ansible.builtin.import_role:
+            name: automation_practice.operators.ibm_api_connect_operator
+          tags:
+            - api-connect
+
+        # Deploy IBM Datapower Operator
+        - name: Deploy IBM Datapower Operator
+          ansible.builtin.import_role:
+            name: automation_practice.operators.ibm_datapower_operator
+          tags:
+            - datapower
+
+        # Deploy Cert-Manager Operator
+        - name: Deploy Cert-Manager Operator
+          ansible.builtin.import_role:
+            name: automation_practice.operators.cert_manager_operator
+          tags:
+            - cert-manager
+
+      always:
+        - name: Log out of cluster and revoke access
+          shell: |
+            oc logout

@@ -1,0 +1,29 @@
+﻿apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+    - htpasswd:
+        fileData:
+          name: htpasswd-9b2dx
+      mappingMethod: claim
+      name: htpasswd
+      type: HTPasswd
+    - mappingMethod: claim
+      name: openid
+      openID:
+        claims:
+          email:
+            - email
+          name:
+            - name
+          preferredUsername:
+            - preferred_username
+        clientID: {{ az_app_client_id.stdout }}
+        clientSecret:
+          name: openid-client-secret
+        extraScopes: []
+        issuer: 'https://login.microsoftonline.com/{{ az_app_tenantid.stdout }}'
+      type: OpenID
+  

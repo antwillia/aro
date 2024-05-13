@@ -1,0 +1,8 @@
+---
+channel: alpha
+installPlanApproval: Automatic
+startingCSV: dynatrace-operator.v1.0.1
+apiUrl: # dynatrace url
+eks-k8s: # token
+apiToken:  #dynatrace secret api token
+name:   # Dynatrace Secret Name

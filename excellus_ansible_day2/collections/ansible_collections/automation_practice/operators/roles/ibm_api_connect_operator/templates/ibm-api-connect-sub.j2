@@ -1,0 +1,12 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: ibm-apiconnect
+  namespace: openshift-operators
+spec:
+  channel: {{ channel }}
+  installPlanApproval: {{ installPlanApproval }}
+  name: "ibm-apiconnect"
+  source: "ibm-operator-catalog"
+  sourceNamespace: "openshift-marketplace"
+  startingCSV: {{ startingCSV }}

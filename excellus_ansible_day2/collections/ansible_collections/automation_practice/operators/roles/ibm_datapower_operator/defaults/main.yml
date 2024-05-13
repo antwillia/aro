@@ -1,0 +1,4 @@
+---
+channel: v1.6
+installPlanApproval: Automatic
+startingCSV: datapower-operator.v1.6.13

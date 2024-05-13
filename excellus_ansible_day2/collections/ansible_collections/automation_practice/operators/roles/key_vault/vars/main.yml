@@ -1,0 +1,5 @@
+---
+# vars file for key_vault
+
+vault_name: anwillia-vault2
+secret_name: kubeconfig

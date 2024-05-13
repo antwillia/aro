@@ -1,0 +1,46 @@
+---
+- name: Deploy Openshift Logging Operator Namespace
+  kubernetes.core.k8s:
+    state: present
+    api_key: "{{ ocpApiKey }}"
+    validate_certs: False
+    wait: yes
+    definition: "{{ lookup('file', 'files/openshift-logging-ns.yaml') | from_yaml }}"
+
+- name: Deploy Openshift Logging Operator Group
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    validate_certs: False
+    state: present
+    wait: yes
+    resource_definition: "{{ lookup('file', 'files/openshift-logging-og.yaml') | from_yaml }}"
+
+- name: Deploy Openshift Logging Subscription
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    validate_certs: False
+    state: present
+    wait: yes
+    resource_definition: "{{ lookup('template', 'templates/openshift-logging-sub.j2') }}"
+
+- name: Enable Console Plugin
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    validate_certs: False
+    state: patched
+    api_version: operator.openshift.io/v1
+    kind: Console
+    name: cluster
+    definition:
+      spec:
+        plugins:
+          - logging-view-plugin
+
+# # Place holder for Openshift Logging instance
+# - name: Deploy Openshift Logging instance
+#   kubernetes.core.k8s:
+#     api_key: "{{ ocpApiKey }}"
+#     state: present
+#     wait: yes
+#     resource_definition:
+...

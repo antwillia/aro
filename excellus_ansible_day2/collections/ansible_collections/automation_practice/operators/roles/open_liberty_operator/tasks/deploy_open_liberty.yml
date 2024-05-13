@@ -1,0 +1,23 @@
+---
+# - name: Deploy Open-Liberty Operator Group
+#   kubernetes.core.k8s:
+#     api_key: "{{ ocpApiKey }}"
+#     state: present
+#     wait: yes
+#     resource_definition: "{{ lookup('file', 'files/open-liberty-og.yaml') | from_yaml }}"
+
+- name: Deploy Open-Liberty Subscription
+  kubernetes.core.k8s:
+    api_key: "{{ ocpApiKey }}"
+    state: present
+    wait: yes
+    resource_definition: "{{ lookup('template', 'templates/open-liberty-sub.j2') }}"
+
+# # Place holder for Open-Liberty instance
+# - name: Deploy Open-Liberty instance
+#   kubernetes.core.k8s:
+#     api_key: "{{ ocpApiKey }}"
+#     state: present
+#     wait: yes
+#     resource_definition:
+...
