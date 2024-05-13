@@ -1,0 +1,3 @@
+node_count: 1
+kubeadminPassword: # Lookup kubeadmin Password from vault
+ocpApiHost: # OCP API URL

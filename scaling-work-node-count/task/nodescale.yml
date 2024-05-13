@@ -1,0 +1,61 @@
+---
+tasks:
+  - name: Access cluster and Update Work Node Count
+    block:
+      - name: Login with shell to get Kubeadmin token
+        shell: |
+          oc login -u kubeadmin -p {{ kubeadminPassword }} {{ ocpApiHost }} &> /dev/null
+          oc whoami --show-token
+        register: loginResult
+        until: ('sha256' in loginResult.stdout)
+        retries: 3
+        delay: 3
+        no_log: True
+
+      - name: Set apiKey fact
+        set_fact:
+          ocpApiKey: "{{ loginResult.stdout }}"
+
+      - name: MachineSet_1
+        ansible.builtin.shell: "oc get machineset --no-headers | awk '{print $1}'"
+        register: aro_machine_set
+        changed_when: false
+
+      - name: Show machineset_1
+        ansible.builtin.debug:
+          msg: "{{ aro_machine_set.stdout_lines }}"
+
+      - name: Make dictionary from list
+        ansible.builtin.set_fact:
+          listing_dictionary: "{{ listing_dictionary | default([]) + [item] }}"
+        loop: "{{ aro_machine_set.stdout_lines }}"
+
+      - name: Patching MachineSets
+        kubernetes.core.k8s_json_patch:
+          api_version: machine.openshift.io/v1beta1
+          kind: MachineSet
+          name: "{{ item }}"
+          namespace: openshift-machine-api
+          patch:
+            - op: replace
+              path: resources/spec/replicas
+              value: "{{ node_count }}"
+        loop: "{{ listing_dictionary }}"
+
+      - name: Wait until all worker nodes get created and are in ready state
+        k8s_info:
+          api_version: machine.openshift.io/v1beta1
+          name: "{{ item }}"
+          kind: MachineSet
+          namespace: openshift-machine-api
+        loop: "{{ listing_dictionary }}"
+        register: machineset_change
+        until: ( machineset_change.resources[0].status.availableReplicas is defined) and
+              ( machineset_change.resources[0].status.replicas == machineset_change.resources[0].status.availableReplicas )
+        retries: 30
+        delay: 30
+        ignore_errors: false
+    always:
+      - name: Log out of cluster and revoke access
+        shell: |
+          oc logout
